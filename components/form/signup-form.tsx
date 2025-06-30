@@ -101,7 +101,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
                     <FormItem>
                       <FormLabel>Username</FormLabel>
                       <FormControl>
-                        <Input placeholder="shadcn" {...field} />
+                        <Input placeholder="username" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
