@@ -1,6 +1,6 @@
 'use server'
 import { connectToDatabase } from "@/lib/database"
-import { Item } from "../database/models/item.model"
+import { IItem, Item } from "../database/models/item.model"
 import { CreateItemParams } from "@/types"
 import { handleError } from "../utils"
 import { revalidatePath } from "next/cache";
@@ -26,19 +26,28 @@ export const createItem = async (itemData: CreateItemParams) => {
 export async function getItemById(itemId: string) {
   try {
     await connectToDatabase();
-    const item = await Item.findById(itemId).populate('category')
+    
+    const item = await Item.findById(itemId)
+      .populate({
+        path: 'category',
+      })
+      .lean<IItem>() 
+      .exec();
 
     if (!item) {
-      return {
-        data: null,
-        message: "Item not found",
-      };
+      throw new Error('Item not found');
     }
 
-    return JSON.parse(JSON.stringify(item))
+    return item;
+
   } catch (error) {
-    console.error("Error fetching item by ID:", error);
-    throw new Error("Failed to fetch item by ID");
+    console.error("Error in getItemById:", error);
+    
+    throw new Error(
+      error instanceof Error 
+        ? error.message 
+        : 'Failed to fetch item'
+    );
   }
 }
 
