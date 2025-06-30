@@ -13,24 +13,44 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        console.log('Authorization attempt with credentials:', credentials?.email);
+        
+        if (!credentials?.email || !credentials?.password) {
+          console.log('Missing credentials');
+          return null;
+        }
 
-        await connectToDatabase();
+        try {
+          await connectToDatabase();
+          console.log('Database connected successfully');
+          
+          const user = await User.findOne({ email: credentials.email }).lean<IUser>().exec();
+          console.log('User found:', user ? user.email : 'none');
+          
+          if (!user) {
+            console.log('User not found');
+            return null;
+          }
 
-        const user = await User.findOne({ email: credentials.email }).lean<IUser>().exec();
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          console.log('Password validation result:', isValid);
+          
+          if (!isValid) {
+            console.log('Invalid password');
+            return null;
+          }
 
-        if (!user) return null;
-
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
-
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          username: user.username,
-          isAdmin: user.isAdmin,
-        };
-      },
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            username: user.username,
+            isAdmin: user.isAdmin,
+          };
+        } catch (error) {
+          console.error('Authorization error:', error);
+          return null;
+        }
+      }
     }),
   ],
   session: {
