@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { SquarePen, Trash } from 'lucide-react'
-import { deleteItem, getItemById } from '@/lib/actions/item.actions'
+import { deleteItem } from '@/lib/actions/item.actions'
 import Loading from '@/components/reusable/Loading'
 
 interface VariantOption {
@@ -30,27 +30,39 @@ interface Variant {
 
 const ItemDetails = () => {
   const router = useRouter()
-  const { id } = useParams()
-  const [item, setItem] = useState<IItem | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { id } = useParams();
+  const [item, setItem] = useState<IItem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const data = await getItemById(id as string)
-        if (!data) throw new Error('Item not found')
-        setItem(data)
-      } catch (err) {
-        console.log(err)
-        setError('Failed to fetch item')
-      } finally {
-        setLoading(false)
-      }
-    }
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch(`/api/items/${id}`);
+        
+        if (!response.ok) {
+          throw new Error(
+            response.status === 404 
+              ? 'Item not found' 
+              : 'Failed to fetch item'
+          );
+        }
 
-    if (id) fetchItem()
-  }, [id])
+        const data = await response.json();
+        setItem(data);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchItem();
+  }, [id]);
 
   const handleEdit = () => {
     router.push(`/dashboard/menu/${item?._id}/update`)
@@ -66,6 +78,7 @@ const ItemDetails = () => {
 
   if (loading) return <Loading />
   if (error || !item) return <div className="p-10 text-center text-red-500">Error: {error || 'Item not found'}</div>
+  
   return (
     <div className="p-3">
       <div className="flex gap-4">
