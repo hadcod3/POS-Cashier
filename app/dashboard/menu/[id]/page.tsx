@@ -66,7 +66,6 @@ const ItemDetails = () => {
 
   if (loading) return <Loading />
   if (error || !item) return <div className="p-10 text-center text-red-500">Error: {error || 'Item not found'}</div>
-
   return (
     <div className="p-3">
       <div className="flex gap-4">
