@@ -1,39 +1,28 @@
-import mongoose, { Mongoose } from 'mongoose'
+import mongoose from 'mongoose';
 
-const MONGODB_URL = process.env.MONGODB_URL
+const MONGODB_URI = process.env.MONGODB_URI;
 
-type CachedMongoose = {
-  conn: Mongoose | null
-  promise: Promise<Mongoose> | null
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
 
-declare global {
-  // Don't use `var` — just declare the shape of `global`
-  let mongoose: CachedMongoose | undefined
-}
-
-const globalWithMongoose = global as typeof globalThis & {
-  mongoose?: CachedMongoose
-}
-
-let cached = globalWithMongoose.mongoose ?? { conn: null, promise: null }
+const cached: MongooseCache = (global as { mongoose?: MongooseCache }).mongoose || { 
+  conn: null, 
+  promise: null 
+};
 
 export const connectToDatabase = async () => {
-  if (cached.conn) return cached.conn
-  if (!MONGODB_URL) throw new Error('MONGODB_URL is missing')
+    if (cached.conn) return cached.conn;
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URL, {
-      dbName: 'hadCashier',
-      bufferCommands: false,
-    }).catch((err) => {
-      cached = { conn: null, promise: null }
-      throw err
+    if (!MONGODB_URI) throw new Error('MONGODB_URI is missing')
+
+    cached.promise = cached.promise || mongoose.connect(MONGODB_URI, {
+        dbName: 'hadCashier',
+        bufferCommands: false,
     })
-  }
 
-  cached.conn = await cached.promise
-  globalWithMongoose.mongoose = cached
-
-  return cached.conn
-}
+    cached.conn = await cached.promise;
+    
+    return cached.conn;
+};

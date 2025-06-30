@@ -171,7 +171,7 @@ export default function Page() {
               {cart.length > 0 ? (
                 cart.map((entry, idx) => (
                   <div key={idx} onClick={() => openModal(entry.item, 'edit', idx)} className="relative flex gap-2 p-2 hover:bg-zinc-100 transition-all rounded-xl">
-                    <Image width={1000} height={1000} src={entry.item.imgUrl} alt="cart_thumb" className="h-20 aspect-square object-cover rounded-md" />
+                    <Image width={1000} height={1000} src={entry.item.imgUrl} alt="cart_thumb" className="w-20 aspect-square object-cover rounded-md" />
                     <div className="flex-1">
                       <p className="font-semibold">{entry.item.name}</p>
                       <p className="text-sm text-zinc-600">Rp {(entry.item.price + (entry.variantPrice || 0)).toLocaleString()}</p>
