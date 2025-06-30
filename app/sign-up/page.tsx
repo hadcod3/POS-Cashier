@@ -1,20 +1,11 @@
 'use client'
 import { SignupForm } from "@/components/form/signup-form"
 import { StepBack } from "lucide-react"
-import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 
 export default function SignUpPage() {
   const router = useRouter()
-
-  const { status } = useSession()
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/sign-in")
-    }
-  }, [status, router])
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
