@@ -23,25 +23,24 @@ export const createItem = async (itemData: CreateItemParams) => {
 }
 
 // GET ITEM BY ID
-export async function getItemById(itemId: string) {
-  try {
-    await connectToDatabase();
-    const item = await Item.findById(itemId).populate('category')
+// export async function getItemById(itemId: string) {
+//   try {
+//     await connectToDatabase();
+//     const item = await Item.findById(itemId)
 
-    if (!item) {
-      return {
-        data: null,
-        message: "Item not found",
-      };
-    }
+//     if (!item) {
+//       return {
+//         data: null,
+//         message: "Item not found",
+//       };
+//     }
 
-    return JSON.parse(JSON.stringify(item))
-  } catch (error) {
-    console.error("Error fetching item by ID:", error);
-    throw new Error("Failed to fetch item by ID");
-  }
-}
-
+//     return JSON.parse(JSON.stringify(item));
+//   } catch (error) {
+//     console.error("Error fetching item by ID:", error);
+//     throw new Error("Failed to fetch item by ID");
+//   }
+// }
 
 // DELETE AN ITEM
 export const deleteItem = async ({ id, path }: DeleteItemParams) => {
@@ -57,5 +56,23 @@ export const deleteItem = async ({ id, path }: DeleteItemParams) => {
     if (deletedItem) revalidatePath(path)
   } catch (error) {
     handleError(error)
+  }
+}
+
+export async function getItemById(id : string) {
+  try {
+    await connectToDatabase()
+    
+    const item = await Item.findById(id);
+    if (!item) {
+      return {
+        data: null,
+        message: "Item not found",
+      };
+    }
+
+    return JSON.parse(JSON.stringify(item));
+  } catch (error) {
+    console.error('Error fetching item by ID:', error);
   }
 }

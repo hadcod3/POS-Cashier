@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     await connectToDatabase();
-    const items = await Item.find().populate("category");
+    const items = await Item.find();
     return NextResponse.json(items);
   } catch (error) {
     return NextResponse.json({ message: "Failed to fetch items", error }, { status: 500 });

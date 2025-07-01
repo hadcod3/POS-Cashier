@@ -1,4 +1,3 @@
-import { getItemById } from '@/lib/actions/item.actions';
 import { connectToDatabase } from '@/lib/database';
 import { Item } from '@/lib/database/models/item.model';
 import { NextResponse } from 'next/server';
@@ -33,24 +32,34 @@ export async function PATCH(req: Request) {
     );
   }
 }
-
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
-    const item = await getItemById(params.id);
+    const { id } = await params;
 
+    if (!id) {
+      return NextResponse.json(
+        { message: "ID parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    const item = await Item.findById(id);
+    
     if (!item) {
-      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+      return NextResponse.json(
+        { message: "Item not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(item);
-  } catch (error) {
-    console.error('API Error:', error);
+  } catch (error: unknown) {
+    console.error('Error fetching item:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch item' },
       { status: 500 }
     );
   }

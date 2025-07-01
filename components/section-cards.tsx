@@ -151,8 +151,8 @@ export function SectionCards() {
             {loading ? (
               <Skeleton className="h-6 w-16 rounded-full" />
             ) : (
-              <Badge variant={revenueUp ? "outline" : "destructive"}>
-                {revenueUp ? <IconTrendingUp className="mr-1 size-4" /> : <IconTrendingDown className="mr-1 size-4" />}
+              <Badge variant={"outline"}>
+                {revenueUp ? <IconTrendingUp className="mr-1 size-4 text-green-500" /> : <IconTrendingDown className="mr-1 size-4 text-red-500" />}
                 {revenueGrowth}%
               </Badge>
             )}
@@ -178,8 +178,8 @@ export function SectionCards() {
             {loading ? (
               <Skeleton className="h-6 w-16 rounded-full" />
             ) : (
-              <Badge variant={orderUp ? "outline" : "destructive"}>
-                {orderUp ? <IconTrendingUp className="mr-1 size-4" /> : <IconTrendingDown className="mr-1 size-4" />}
+              <Badge variant={"outline"}>
+                {orderUp ? <IconTrendingUp className="mr-1 size-4 text-green-500" /> : <IconTrendingDown className="mr-1 size-4 text-red-500" />}
                 {orderGrowth}%
               </Badge>
             )}
