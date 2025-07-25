@@ -12,6 +12,7 @@ import { Input } from '../ui/input'
 import { useCart } from './CartContext'
 import { useCartModal } from './CartModalContext'
 import { useEffect, useState } from 'react'
+import { IconMinus, IconPlus } from "@tabler/icons-react"
 
 const CartModal = () => {
   const { isOpen, selectedItem, mode, closeModal, editIndex } = useCartModal()
@@ -33,37 +34,43 @@ const CartModal = () => {
   if (!selectedItem) return null
 
   const handleSubmit = () => {
-    const variantLabel = Object.entries(selectedOptions)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([label]) => label.trim())
-      .join(' | ')
-      .trim();
+  const variantStrings = Object.entries(selectedOptions)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, label]) => {
+      const variant = selectedItem.variants?.find(v => v.name === name);
+      const option = variant?.options.find(opt => opt.label === label);
+      return option?.label || label; // Use the value if available, otherwise fallback to label
+    })
+    .filter(Boolean); // Remove any empty strings
 
-      
-    let variantPrice = 0;
+  const variantLabel = variantStrings.join(' | ');
+
+    // Calculate total variant price
+    let variantPrice = 0
     if (selectedItem?.variants) {
       selectedItem.variants.forEach((variant) => {
-        const selectedLabel = selectedOptions[variant.name];
-        const foundOption = variant.options.find((opt) => opt.label === selectedLabel);
-        if (foundOption) variantPrice += foundOption.price;
-      });
+        const selectedLabel = selectedOptions[variant.name]
+        const foundOption = variant.options.find((opt) => opt.label === selectedLabel)
+        if (foundOption) variantPrice += foundOption.price
+      })
     }
 
     const cartEntry = {
       item: selectedItem,
       quantity,
       variantLabel: variantLabel || undefined,
-      variantPrice: variantPrice || 0, // ✅ pass it
-    };
-
-    if (mode === 'edit' && editIndex !== null) {
-      updateCartItem(editIndex, cartEntry);
-    } else {
-      addToCart(cartEntry);
+      variantPrice: variantPrice || 0,
+      selectedVariants: selectedOptions, 
     }
 
-    closeModal();
-  };
+    if (mode === 'edit' && editIndex !== null) {
+      updateCartItem(editIndex, cartEntry)
+    } else {
+      addToCart(cartEntry)
+    }
+
+    closeModal()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
@@ -104,16 +111,35 @@ const CartModal = () => {
 
           <div>
             <label className="block text-sm font-medium mb-1">Quantity</label>
-            <Input
-              type="number"
-              min={selectedItem.minOrder || 1}
-              value={quantity}
-              onChange={(e) => {
-                const q = parseInt(e.target.value) || selectedItem.minOrder || 1;
-                setQuantity(Math.max(selectedItem.minOrder || 1, q));
-              }}
-              className="w-20"
-            />
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setQuantity(prev => Math.max(selectedItem.minOrder || 1, prev - 1))}
+                disabled={quantity <= (selectedItem.minOrder || 1)}
+                className='min-w-9 w-9 min-h-9 h-9'
+              >
+                <IconMinus className="size-4" />
+              </Button>
+              <Input
+                type="number"
+                min={selectedItem.minOrder || 1}
+                value={quantity}
+                onChange={(e) => {
+                  const q = parseInt(e.target.value) || selectedItem.minOrder || 1;
+                  setQuantity(Math.max(selectedItem.minOrder || 1, q));
+                }}
+                className="w-16 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setQuantity(prev => prev + 1)}
+                className='min-w-9 w-9 min-h-9 h-9'
+              >
+                <IconPlus className="size-4" />
+              </Button>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

@@ -16,14 +16,18 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<CartEntry[]>([])
 
+    const getVariantKey = (variantLabel: string | undefined) => {
+      return (variantLabel || '').split('|').map(str => str.trim()).sort().join(' | ').trim()
+    }
+
     const addToCart = (entry: CartEntry) => {
-      const normalizedLabel = (entry.variantLabel || '').trim();
+      const normalizedLabel = getVariantKey(entry.variantLabel);
 
       setCart((prev) => {
         const existingIndex = prev.findIndex(
           (i) =>
             i.item._id === entry.item._id &&
-            (i.variantLabel || '').trim() === normalizedLabel
+            getVariantKey(i.variantLabel) === normalizedLabel
         );
 
         if (existingIndex !== -1) {
@@ -39,13 +43,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
             {
               ...entry,
               variantLabel: normalizedLabel,
-              variantPrice: entry.variantPrice || 0, // make sure to store this
+              variantPrice: entry.variantPrice || 0,
             },
           ];
         }
       });
     };
-
 
   const updateCartItem = (index: number, entry: CartEntry) => {
     setCart((prev) => {

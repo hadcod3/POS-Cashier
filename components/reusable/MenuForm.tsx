@@ -175,8 +175,8 @@ export function MenuForm({ typeForm, data }: { typeForm: "Create" | "Update"; da
                   <div>
                     <Input 
                       type="number" 
-                      placeholder="Min. Order" 
-                      min={0}
+                      placeholder="Min. Order"
+                      min={1}
                       value={field.value || ''}
                       onChange={e => field.onChange(Number(e.target.value))} 
                      />

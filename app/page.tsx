@@ -99,9 +99,7 @@ export default function Page() {
     const variantExtra = i.variantPrice || 0
     return acc + (i.item.price + variantExtra) * i.quantity
   }, 0)
-
-  const tax = subtotal * 0.11
-  const total = subtotal + tax
+  const total = subtotal
 
   const sortedCategories = [
     ...categoriesData.filter(cat => cat._id === "685281b814dee1ddd0b40072"),
@@ -204,7 +202,7 @@ export default function Page() {
             </div>
 
             <div className="w-full">
-              <div className="h-fit py-3">
+              {/* <div className="h-fit py-3">
                 <div className="grid grid-cols-7 text-sm text-zinc-600">
                   <p className="col-span-4">Subtotal</p>
                   <p className="col-start-5 text-center">Rp</p>
@@ -215,7 +213,7 @@ export default function Page() {
                   <p className="col-start-5 text-center">Rp</p>
                   <p className="col-span-2 col-start-6 text-end">{formatPrice(tax)}</p>
                 </div>
-              </div>
+              </div> */}
               <div className="flex items-center justify-between py-3 border-t border-b border-dashed border-zinc-300">
                 <p>Total</p>
                 <p>Rp {formatPrice(total)}</p>

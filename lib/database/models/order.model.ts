@@ -16,7 +16,6 @@ const OrderSchema = new Schema({
   orderOption: { type: String, enum: ['dine-in', 'take-away'], required: true },
   paymentMethod: { type: String, enum: ['cash', 'qris'], required: true },
   subtotal: Number,
-  tax: Number,
   total: Number,
   createdAt: { type: Date, default: Date.now }
 })

@@ -31,3 +31,7 @@ export interface CartEntry {
   variantLabel?: string
   variantPrice?: number;
 }
+
+export interface OrderData {
+  _id?: string;
+}
